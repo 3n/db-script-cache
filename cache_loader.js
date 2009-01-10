@@ -1,3 +1,5 @@
+window.script_cache = {}
+
 function create_script_elem(src){
 	var script_elem = document.createElement('script')
 	if (src) script_elem.src = src
@@ -9,6 +11,6 @@ function create_script_elem(src){
 create_script_elem('scriiip.js')
 
 setTimeout(function(){
-	var the_codes = scriiip.toString().replace(/function\s\w+\(\)\s\{/,'').slice(1,-1)	
+	var the_codes = window.script_cache['scriiip'].toString().replace(/function\s\(\)\s\{/,'').slice(1,-1)	
 	create_script_elem(null).innerHTML = the_codes
 }, 200)
