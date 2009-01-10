@@ -36,9 +36,9 @@ window.script_db.transaction(function(transaction){
 		else {
 			create_script_elem(script_name + '.js')
 			setTimeout(function(){
-				var the_codes = window.script_data[script_name].toString().replace(/function\s\(\)\s\{/,'').slice(1,-1)	
+				var the_codes = window.script_data[script_name].toString().replace(/^function\s*\(\)\s*\{/,'').slice(1,-1)	
 				create_script_elem().innerHTML = the_codes
-
+				
 				window.script_db.transaction(function(transaction){
 					transaction.executeSql('insert into scripts (name, code) VALUES ("' + script_name + '", "' + the_codes + '");', [], nullDataHandler, errorHandler)
 				})
