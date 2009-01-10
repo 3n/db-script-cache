@@ -1,4 +1,4 @@
-window.script_cache['scriiip'] = function(){
+window.script_data['scriiip'] = function(){
 	
 var message = 'YO DAWG I HERD YOU LIKE JAVASCRIPT SO I PUT SOME JAVASCRIPT IN YOUR JAVASCRIPT SO YOU CAN JAVASCRIPT WHILE YOU JAVASCRIPT!'
 console.log(message);	
