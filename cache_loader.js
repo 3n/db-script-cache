@@ -31,17 +31,18 @@ function create_script_elem(src){
 
 window.script_db.transaction(function(transaction){
 	transaction.executeSql('select code from scripts where name = \'' + script_name + '\';', [], function(transaction, data){
-		console.log(data.rows.item(0).code)
+		if (data.rows.length > 0)
+			create_script_elem().innerHTML = data.rows.item(0).code
+		else {
+			create_script_elem(script_name + '.js')
+			setTimeout(function(){
+				var the_codes = window.script_data[script_name].toString().replace(/function\s\(\)\s\{/,'').slice(1,-1)	
+				create_script_elem().innerHTML = the_codes
+
+				window.script_db.transaction(function(transaction){
+					transaction.executeSql('insert into scripts (name, code) VALUES ("' + script_name + '", "' + the_codes + '");', [], nullDataHandler, errorHandler)
+				})
+			}, 200)
+		}
 	}, errorHandler)
 })
-
-create_script_elem(script_name + '.js')
-
-setTimeout(function(){
-	var the_codes = window.script_data[script_name].toString().replace(/function\s\(\)\s\{/,'').slice(1,-1)	
-	create_script_elem().innerHTML = the_codes
-	
-	window.script_db.transaction(function(transaction){
-		transaction.executeSql('insert into scripts (name, code) VALUES ("' + script_name + '", "' + the_codes + '");', [], nullDataHandler, errorHandler)
-	})
-}, 200)
