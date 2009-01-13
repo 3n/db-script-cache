@@ -20,7 +20,8 @@ function ScriptCache(){
 	}
 	
 	var get_code = function(script_name){
-		return window.script_data[script_name].toString().replace(/^function\s*\(\)\s*\{/,'').slice(1,-1)
+		if (window.script_data[script_name])
+			return window.script_data[script_name].toString().replace(/^function\s*\(\)\s*\{/,'').slice(1,-1)
 	}
 	
 	var store_in_cache = function(script_name, code){
@@ -28,7 +29,16 @@ function ScriptCache(){
 			transaction.executeSql('insert into scripts (name, code) VALUES (?,?);', [script_name, code], nullDataHandler, errorHandler)
 		})
 	}
-		
+	
+	var get_and_store = function(script_name){
+		var the_codes = get_code(script_name)
+		if (the_codes){
+			create_script_elem().innerHTML = the_codes
+			store_in_cache(script_name, the_codes)
+		} else
+			setTimeout(function(){ get_and_store(script_name) }, 100)
+	}
+
 	return {
 		include: function(script_name){
 			thiz.db.transaction(function(transaction){
@@ -36,13 +46,8 @@ function ScriptCache(){
 					if (data.rows.length > 0)
 						create_script_elem().innerHTML = data.rows.item(0).code
 					else {
-						console.log('PULLING LIVE DAWG')
 						create_script_elem(script_name)
-						setTimeout(function(){
-							var the_codes = get_code(script_name)
-							create_script_elem().innerHTML = the_codes
-							store_in_cache(script_name, the_codes)
-						}, 500)
+						get_and_store(script_name)
 					}
 				}, errorHandler)
 			});
