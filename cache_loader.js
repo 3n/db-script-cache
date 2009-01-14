@@ -8,7 +8,7 @@ function ScriptCache(){
 	var errorHandler    = function(transaction, error){ console.log(error.message); return true; }
 	
 	if (thiz.db) thiz.db.transaction(function(transaction){
-		transaction.executeSql('CREATE TABLE scripts(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, code TEXT NOT NULL);', [], nullDataHandler, errorHandler);
+		transaction.executeSql('CREATE TABLE scripts(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, version TEXT NOT NULL, code TEXT NOT NULL);', [], nullDataHandler, errorHandler);
 	});
 	
 	var create_script_elem = function(src){
@@ -24,35 +24,43 @@ function ScriptCache(){
 			return window.script_data[script_name].toString().replace(/^function\s*\(\)\s*\{/,'').slice(1,-1)
 	}
 	
-	var store_in_cache = function(script_name, code){
+	var store_in_cache = function(script_name, version, code){
 		if (thiz.db) thiz.db.transaction(function(transaction){
-			transaction.executeSql('insert into scripts (name, code) VALUES (?,?);', [script_name, code], nullDataHandler, errorHandler)
+			transaction.executeSql('insert into scripts (name, version, code) VALUES (?,?,?);', [script_name, version, code], nullDataHandler, errorHandler)
 		})
 	}
 	
-	var get_and_store = function(script_name){		
+	var get_and_store = function(script_name, version){		
 		var the_codes = get_code(script_name)
 		if (the_codes){
 			eval.call(window, the_codes)
-			store_in_cache(script_name, the_codes)
+			store_in_cache(script_name, version, the_codes)
 		} else
-			setTimeout(function(){ get_and_store(script_name) }, 100)
+			setTimeout(function(){ get_and_store(script_name, version) }, 100)
+	}
+	
+	var clear_versions = function(script_name){
+		if (thiz.db) thiz.db.transaction(function(transaction){
+			transaction.executeSql('delete from scripts where name=?;', [script_name], nullDataHandler, errorHandler)
+		})
 	}
 	
 	return {
-		include: function(script_name){
+		include: function(script_name, version){
+			var version = version || '1.0'
 			if (!thiz.db){
 				create_script_elem(script_name)
-				get_and_store(script_name)
+				get_and_store(script_name, version)
 				return
 			}
 			thiz.db.transaction(function(transaction){
-				transaction.executeSql('select code from scripts where name=?;', [script_name], function(transaction, data){
+				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
 					if (data.rows.length > 0)
 						eval.call(window, data.rows.item(0).code)
 					else {
+						clear_versions(script_name)
 						create_script_elem(script_name)
-						get_and_store(script_name)
+						get_and_store(script_name, version)
 					}												
 				}, errorHandler)
 			});
