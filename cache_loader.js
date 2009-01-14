@@ -2,7 +2,7 @@ window.script_data = {}
 
 function ScriptCache(){
 	var thiz = this
-	thiz.db = window.openDatabase ? openDatabase('scriptCacheDB', '1.0', 'Javascript cache', 1000000) : null;
+	thiz.db = window.openDatabase ? openDatabase('scriptCache', '1.0', 'Javascript cache', 1000000) : null;
 	
 	var nullDataHandler = function(transaction, error){ console.log(error); return true; }
 	var errorHandler    = function(transaction, error){ console.log(error.message); return true; }
