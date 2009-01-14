@@ -33,7 +33,7 @@ function ScriptCache(){
 	var get_and_store = function(script_name){
 		var the_codes = get_code(script_name)
 		if (the_codes){
-			create_script_elem().innerHTML = the_codes
+			eval(the_codes)
 			store_in_cache(script_name, the_codes)
 		} else
 			setTimeout(function(){ get_and_store(script_name) }, 100)
@@ -44,7 +44,7 @@ function ScriptCache(){
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=?;', [script_name], function(transaction, data){
 					if (data.rows.length > 0)
-						create_script_elem().innerHTML = data.rows.item(0).code
+						eval(data.rows.item(0).code)
 					else {
 						create_script_elem(script_name)
 						get_and_store(script_name)
@@ -57,9 +57,8 @@ function ScriptCache(){
 				transaction.executeSql('DELETE FROM scripts WHERE name=?;', [script_name], nullDataHandler, errorHandler)
 			});
 		}
-	}
-	
+	}	
 }
 
-var sc = new ScriptCache()
-sc.include('scriiip.js')
+var scripts = document.getElementsByTagName("script");
+eval(scripts[scripts.length - 1].innerHTML);
