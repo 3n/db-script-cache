@@ -30,14 +30,14 @@ function ScriptCache(){
 		})
 	}
 	
-	var sanatize_angle_brackets = function(string){
-		return string.replace(/'([^'\n;]*)(<)([^'\n;]*)'/g,     "'$1\\u003c$3'")
-								 .replace(/'([^'\n;]*)(>)([^'\n;]*)'/g,     "'$1\\u003e$3'")
-								 .replace(/"([^"\n;]*)(<)([^"\n;]*)"/g,   "\"$1\\u003c$3\"")
-	  						 .replace(/"([^"\n;]*)(>)([^"\n;]*)"/g,   "\"$1\\u003e$3\"")
-								 .replace(/\/([^\/\n;]*)(<)([^\/\n;]*)\//g, "/$1\\u003c$3/")
-								 .replace(/\/([^\/\n;]*)(>)([^\/\n;]*)\//g, "/$1\\u003e$3/")
-	}
+	// var sanatize_angle_brackets = function(string){
+	// 	return string.replace(/'([^'\n;]*)(<)([^'\n;]*)'/g,     "'$1\\u003c$3'")
+	// 							 .replace(/'([^'\n;]*)(>)([^'\n;]*)'/g,     "'$1\\u003e$3'")
+	// 							 .replace(/"([^"\n;]*)(<)([^"\n;]*)"/g,   "\"$1\\u003c$3\"")
+	//   						 .replace(/"([^"\n;]*)(>)([^"\n;]*)"/g,   "\"$1\\u003e$3\"")
+	// 							 .replace(/\/([^\/\n;]*)(<)([^\/\n;]*)\//g, "/$1\\u003c$3/")
+	// 							 .replace(/\/([^\/\n;]*)(>)([^\/\n;]*)\//g, "/$1\\u003e$3/")
+	// }
 	
 	var execute_code = function(code){
 		eval.call(window, code)
@@ -45,13 +45,13 @@ function ScriptCache(){
 		// create_script_elem().innerHTML = tmp
 	}
 	
-	var get_and_store = function(script_name, version){		
+	var get_and_store = function(script_name, version, callback){		
 		var the_codes = get_code(script_name)
 		if (the_codes){
-			execute_code(the_codes)
+			if (callback) callback(the_codes)
 			store_in_cache(script_name, version, the_codes)
 		} else
-			setTimeout(function(){ get_and_store(script_name, version) }, 100)
+			setTimeout(function(){ get_and_store(script_name, version, callback) }, 100)
 	}
 	
 	var clear_versions = function(script_name){
@@ -60,26 +60,41 @@ function ScriptCache(){
 		})
 	}
 	
-	return {
-		include: function(script_name, version){
-			var version = version || '1.0'
-			if (!thiz.db){
-				create_script_elem(script_name)
-				get_and_store(script_name, version)
-				return
-			}
+	thiz.the_codes = []
+	
+	var include_script = function(script_name, version, index, is_last){
+		if (!thiz.db){ 		// todo - make work again
+			get_and_store(script_name, version, function(c){
+				thiz.the_codes[index] = c
+				if (is_last) execute_code(thiz.the_codes.join(''))
+			})
+		}else{
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
-					if (data.rows.length > 0)
-						execute_code(data.rows.item(0).code)
-					else {
+					if (data.rows.length > 0){
+						thiz.the_codes[index] = data.rows.item(0).code
+						if (is_last) execute_code(thiz.the_codes.join(''))
+					} else {
 						clear_versions(script_name)
 						create_script_elem(script_name)
-						get_and_store(script_name, version)
+						get_and_store(script_name, version, function(c){
+							thiz.the_codes[index] = c
+							if (is_last) execute_code(thiz.the_codes.join(''))
+						})
 					}												
 				}, errorHandler)
 			});
-			return thiz;
+		}
+		return thiz;
+	}
+	
+	return {
+		includes: function(scripts){
+			for (var i=0; i<scripts.length; i++)
+				include_script(scripts[i][0], scripts[i][1], i, i == scripts.length-1)
+		},
+		include: function(script_name, version){
+			include_script(script_name, version, 0, true)
 		},
 		clear_from_cache: function(script_name){
 			thiz.db.transaction(function(transaction){

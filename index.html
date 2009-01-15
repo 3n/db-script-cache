@@ -7,9 +7,12 @@
   	<title>SCRIIIIP</title>  	
 
   	<script type="text/javascript" src="cache_loader.js">
-    	window.script_cache = window.script_cache || new ScriptCache();
-      window.script_cache.include('mootools-1.2.1-core.js', '1.2');
-      window.script_cache.include('scriiip.js', '1.2');
+      window.script_cache = window.script_cache || new ScriptCache();
+      window.script_cache.includes([ 
+        ['mootools-1.2.1-core.js','1.0'], 
+        ['scriiip.js'            ,'1.0'] 
+      ]);
+      // window.script_cache.include('scriiip.js', '1.2');
     </script>
   </head>
   
