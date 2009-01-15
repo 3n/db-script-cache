@@ -30,10 +30,25 @@ function ScriptCache(){
 		})
 	}
 	
+	var sanatize_angle_brackets = function(string){
+		return string.replace(/'([^'\n;]*)(<)([^'\n;]*)'/g,     "'$1\\u003c$3'")
+								 .replace(/'([^'\n;]*)(>)([^'\n;]*)'/g,     "'$1\\u003e$3'")
+								 .replace(/"([^"\n;]*)(<)([^"\n;]*)"/g,   "\"$1\\u003c$3\"")
+	  						 .replace(/"([^"\n;]*)(>)([^"\n;]*)"/g,   "\"$1\\u003e$3\"")
+								 .replace(/\/([^\/\n;]*)(<)([^\/\n;]*)\//g, "/$1\\u003c$3/")
+								 .replace(/\/([^\/\n;]*)(>)([^\/\n;]*)\//g, "/$1\\u003e$3/")
+	}
+	
+	var execute_code = function(code){
+		eval.call(window, code)
+		// var tmp = sanatize_angle_brackets(sanatize_angle_brackets(sanatize_angle_brackets(sanatize_angle_brackets(code))))
+		// create_script_elem().innerHTML = tmp
+	}
+	
 	var get_and_store = function(script_name, version){		
 		var the_codes = get_code(script_name)
 		if (the_codes){
-			eval.call(window, the_codes)
+			execute_code(the_codes)
 			store_in_cache(script_name, version, the_codes)
 		} else
 			setTimeout(function(){ get_and_store(script_name, version) }, 100)
@@ -56,7 +71,7 @@ function ScriptCache(){
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
 					if (data.rows.length > 0)
-						eval.call(window, data.rows.item(0).code)
+						execute_code(data.rows.item(0).code)
 					else {
 						clear_versions(script_name)
 						create_script_elem(script_name)
@@ -76,4 +91,4 @@ function ScriptCache(){
 }
 
 var scripts = document.getElementsByTagName("script");
-eval(scripts[scripts.length - 1].innerHTML);
+eval.call(window, scripts[scripts.length - 1].innerHTML);
