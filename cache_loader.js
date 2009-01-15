@@ -61,26 +61,30 @@ function ScriptCache(){
 	}
 	
 	thiz.the_codes = []
+	thiz.completed = 0
 	
-	var include_script = function(script_name, version, index, is_last){
+	var include_script = function(script_name, version, index, total){
 		if (!thiz.db){
 			create_script_elem(script_name)
 			get_and_store(script_name, version, function(c){
 				thiz.the_codes[index] = c
-				if (is_last) execute_code(thiz.the_codes.join(''))
+				thiz.completed += 1
+				if (thiz.completed === total) execute_code(thiz.the_codes.join(''))
 			})
 		}else{
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
 					if (data.rows.length > 0){
 						thiz.the_codes[index] = data.rows.item(0).code
-						if (is_last) execute_code(thiz.the_codes.join(''))
+						thiz.completed += 1
+						if (thiz.completed === total) execute_code(thiz.the_codes.join(''))
 					} else {
 						clear_versions(script_name)
 						create_script_elem(script_name)
 						get_and_store(script_name, version, function(c){
 							thiz.the_codes[index] = c
-							if (is_last) execute_code(thiz.the_codes.join(''))
+							thiz.completed += 1
+							if (thiz.completed === total) execute_code(thiz.the_codes.join(''))
 						})
 					}												
 				}, errorHandler)
@@ -92,10 +96,10 @@ function ScriptCache(){
 	return {
 		includes: function(scripts){
 			for (var i=0; i<scripts.length; i++)
-				include_script(scripts[i][0], scripts[i][1], i, i == scripts.length-1)
+				include_script(scripts[i][0], scripts[i][1], i, scripts.length)
 		},
 		include: function(script_name, version){
-			include_script(script_name, version, 0, true)
+			include_script(script_name, version, 0, 1)
 		},
 		clear_from_cache: function(script_name){
 			thiz.db.transaction(function(transaction){
