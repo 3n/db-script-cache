@@ -63,7 +63,8 @@ function ScriptCache(){
 	thiz.the_codes = []
 	
 	var include_script = function(script_name, version, index, is_last){
-		if (!thiz.db){ 		// todo - make work again
+		if (!thiz.db){
+			create_script_elem(script_name)
 			get_and_store(script_name, version, function(c){
 				thiz.the_codes[index] = c
 				if (is_last) execute_code(thiz.the_codes.join(''))
