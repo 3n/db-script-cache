@@ -1,5 +1,3 @@
-window.script_data['mootools-1.2.1-core.js'] = function(){
-
 /*
 Script: Core.js
 	MooTools - My Object Oriented JavaScript Tools.
@@ -3844,5 +3842,3 @@ Request.JSON = new Class({
 	}
 
 });
-
-}

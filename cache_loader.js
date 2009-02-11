@@ -12,11 +12,11 @@ function ScriptCache(){
 	});
 	
 	var create_script_elem = function(src){
-		var script_elem = document.createElement('script');
-		if (src) script_elem.src = src;
-		script_elem.type = 'text/javascript';
-		document.getElementsByTagName('head')[0].appendChild(script_elem);	
-		return script_elem;
+		// var script_elem = document.createElement('script');
+		// if (src) script_elem.src = src;
+		// script_elem.type = 'text/javascript';
+		// document.getElementsByTagName('head')[0].appendChild(script_elem);	
+		// return script_elem;
 	}
 	
 	var get_code = function(script_name){
@@ -46,7 +46,14 @@ function ScriptCache(){
 	}
 	
 	var get_and_store = function(script_name, version, callback){		
-		var the_codes = get_code(script_name)
+		// var the_codes = get_code(script_name)
+		
+		var req = new XMLHttpRequest();  
+		req.open('GET', script_name, false);   
+		req.send(null);  
+		if(req.status == 200)
+			var the_codes = req.responseText;
+		
 		if (the_codes){
 			if (callback) callback(the_codes)
 			store_in_cache(script_name, version, the_codes)
@@ -63,7 +70,7 @@ function ScriptCache(){
 	thiz.the_codes = []
 	thiz.completed = 0
 	
-	var include_script = function(script_name, version, index, total){
+	var include_script = function(script_name, version, index, total){		
 		if (!thiz.db){
 			create_script_elem(script_name)
 			get_and_store(script_name, version, function(c){

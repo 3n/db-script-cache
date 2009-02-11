@@ -1,5 +1,3 @@
-window.script_data['scriiip.js'] = function(){
-
 console.log(Browser.Engine.name);
 console.log(1 < 3);
 var scripts = '<blah';
@@ -10,5 +8,3 @@ function test(x){ return x; }
 console.log(message + test(1) + replaced);
 
 document.body.innerHTML = "XXX YO DAWG I HERD YOU LIKE JAVASCRIPT SO I PUT SOME JAVASCRIPT IN YOUR JAVASCRIPT SO YOU CAN JAVASCRIPT WHILE YOU JAVASCRIPT!";		
-
-}
