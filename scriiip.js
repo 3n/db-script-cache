@@ -1,10 +1,5 @@
-console.log(Browser.Engine.name);
-console.log(1 < 3);
+// Just some random javascript to make sure some character (I'm looking at you '<') does't bust any balls. 
+1 < 3; 
 var scripts = '<blah';
-var x = 1;
 var replaced = "<hello world".replace(/<h/gi,'x');
-var message = "XXX YO DAWG I HERD YOU LIKE JAVASCRIPT SO I PUT SOME JAVASCRIPT IN YOUR JAVASCRIPT SO YOU CAN JAVASCRIPT WHILE YOU JAVASCRIPT!";
-function test(x){ return x; }
-console.log(message + test(1) + replaced);
-
-document.body.innerHTML = "XXX YO DAWG I HERD YOU LIKE JAVASCRIPT SO I PUT SOME JAVASCRIPT IN YOUR JAVASCRIPT SO YOU CAN JAVASCRIPT WHILE YOU JAVASCRIPT!";		
+document.body.innerHTML = "THIS TEXT BROUGHT TO YOU BY JAVASCRIPT<br/><br/>If you can see this, then scriiip.js was loaded propperly - WORD.";		
