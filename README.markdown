@@ -31,6 +31,9 @@ BREIF OVERVIEW
   
 USAGE
 -----
+  Put db\_script\_cache.js in your root dir. All the other files this project
+  are to demo DBScriptCache. 
+
   If possible, only use DBScriptCache on the iPhone version of your site. 
   However, it should work just fine if you included in all versions. 
 
