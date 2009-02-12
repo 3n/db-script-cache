@@ -4,8 +4,8 @@ function ScriptCache(){
 	var thiz = this
 	thiz.db = window.openDatabase ? openDatabase('scriptCache', '1.0', 'Javascript cache', 1000000) : null;
 	
-	var nullDataHandler = function(transaction, error){ console.log(error); return true; }
-	var errorHandler    = function(transaction, error){ console.log(error.message); return true; }
+	var nullDataHandler = function(transaction, error){ /*console.log(error);*/ return true; }
+	var errorHandler    = function(transaction, error){ /*console.log(error.message);*/ return true; }
 	
 	// create table in DB for first run. 
 	if (thiz.db) thiz.db.transaction(function(transaction){
