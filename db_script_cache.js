@@ -97,4 +97,4 @@ function ScriptCache(){
 
 // run the code, if any inside of the script tag that included this script. 
 var scripts = document.getElementsByTagName("script");
-eval.call(window, scripts[scripts.length - 1].innerHTML);
+eval.call(window, scripts[scripts.length - 1].innerHTML); 
