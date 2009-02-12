@@ -1,4 +1,4 @@
-window.script_data = {}
+window.script_data = {};
 
 function ScriptCache(){
 	var thiz = this
