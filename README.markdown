@@ -1,6 +1,22 @@
 *DBScriptCache*  
 *by Ian Collins (3n)*
 
+IMPORTANT NOTE 
+==============
+  There is currently a flaw in this implementation that could cause a
+  problem when used on browser's that do not support openDatabase (Firefox, IE).
+  Basically, your scripts will execute as soon as they are loaded, so if you have
+  two scripts "really_huge_lib.js" and "tiny_app.js" there's a good chance
+  that "tiny_app.js" will load and execute before "really_huge_lib.js" (only
+  on browsers that don't have a client-side db). 
+  
+  This can be fixed when I figure out how to load these scripts in parallel 
+  but execute them in order. It's tough to figure out when a script is done 
+  loading, but it's doable. 
+  
+  For the time being I'd recommend only using this script when you know the 
+  client will have a db (e.g. iPhone). 
+
 BREIF OVERVIEW
 ==============
   DBScriptCache (db\_script\_cache.js) automatically caches script files in the
