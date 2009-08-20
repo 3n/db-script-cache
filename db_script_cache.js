@@ -12,11 +12,19 @@ function ScriptCache(){
 		transaction.executeSql('CREATE TABLE scripts(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, version TEXT NOT NULL, code TEXT NOT NULL);', [], nullDataHandler, errorHandler);
 	});
 	
-	var create_script_elem = function(src){
+	var create_script_elem = function(src, onload){
 		var script_elem = document.createElement('script');
 		if (src) script_elem.src = src;
 		script_elem.type = 'text/javascript';
 		document.getElementsByTagName('head')[0].appendChild(script_elem);	
+		
+		if (onload)
+			script_elem.addEventListener('load', onload, true);
+			script_elem.addEventListener('readystatechange', function(){
+				if (this.readyState == 'loaded' || this.readyState == 'complete')
+					onload();
+			}, true);
+		
 		return script_elem;
 	}
 	
@@ -37,7 +45,7 @@ function ScriptCache(){
 		req.send(null);  
 		if(req.status == 200)
 			var the_codes = req.responseText;
-		
+
 		if (callback) callback(the_codes);
 		store_in_cache(script_name, version, the_codes);
 	}
@@ -57,7 +65,7 @@ function ScriptCache(){
 		else{
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
-					if (data.rows.length > 0){
+					if (data.rows.length > 0 && data.rows.item(0).code && data.rows.item(0).code !== 'undefined'){
 						thiz.the_codes[index] = data.rows.item(0).code;
 						thiz.completed += 1;
 						if (thiz.completed === total) execute_code(thiz.the_codes.join(''));
