@@ -18,12 +18,13 @@ function ScriptCache(){
 		script_elem.type = 'text/javascript';
 		document.getElementsByTagName('head')[0].appendChild(script_elem);	
 		
-		if (onload)
+		if (onload){
 			script_elem.addEventListener('load', onload, true);
 			script_elem.addEventListener('readystatechange', function(){
 				if (this.readyState == 'loaded' || this.readyState == 'complete')
 					onload();
 			}, true);
+		}
 		
 		return script_elem;
 	}
