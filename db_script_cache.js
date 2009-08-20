@@ -89,8 +89,8 @@ function ScriptCache(){
 	
 	return {
 		// include multiple scripts
-		includes: function(scripts){
-			if (window.openDatabase)
+		includes: function(scripts, parallel){
+			if (window.openDatabase || parallel)
 				for (var i=0; i<scripts.length; i++)
 					include_script(scripts[i][0], scripts[i][1], i, scripts.length);
 			else {
