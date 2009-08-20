@@ -64,9 +64,9 @@ function ScriptCache(){
 	thiz.completed = 0;
 	
 	var include_script = function(script_name, version, index, total){		
-		if (!thiz.db)
+		if (!thiz.db)			
 			create_script_elem(script_name); // if the browser doesn't support openDatabase just inject the script elem
-		else{
+		else {
 			thiz.db.transaction(function(transaction){
 				transaction.executeSql('select code from scripts where name=? and version=?;', [script_name, version], function(transaction, data){
 					if (data.rows.length > 0 && data.rows.item(0).code && data.rows.item(0).code !== 'undefined'){
@@ -90,8 +90,14 @@ function ScriptCache(){
 	return {
 		// include multiple scripts
 		includes: function(scripts){
-			for (var i=0; i<scripts.length; i++)
-				include_script(scripts[i][0], scripts[i][1], i, scripts.length);
+			if (window.openDatabase)
+				for (var i=0; i<scripts.length; i++)
+					include_script(scripts[i][0], scripts[i][1], i, scripts.length);
+			else {
+				var i = 0;
+				var load_next = function(){ if (i+1 < scripts.length) create_script_elem(scripts[++i][0], load_next); };
+				create_script_elem(scripts[i][0], load_next)
+			}
 		},
 		// include just one script
 		include: function(script_name, version){
